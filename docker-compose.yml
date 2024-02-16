@@ -1,0 +1,60 @@
+version: '3.8'
+services:
+  nginx:
+    image: nginx:latest
+    container_name: test-nginx
+    ports:
+      - "80:80"
+    volumes:
+      - ./docker/nginx/conf.d:/etc/nginx/conf.d
+      - ./docker/nginx/log:/var/log/nginx
+      - .:/var/www/html
+    links:
+      - app
+    command: "/bin/sh -c 'while :; do sleep 6h & wait $${!}; nginx -s reload; done & nginx -g \"daemon off;\"'"
+    depends_on:
+      - app
+    networks:
+      - test_network
+
+  app:
+    build: ./docker/php8.3
+    container_name: test-app
+    links:
+      - mysql
+    volumes:
+      - .:/var/www/html
+    networks:
+      - test_network
+
+  mysql:
+    image: mariadb:10.11.2
+    container_name: test-mysql
+    volumes:
+      - ./docker/mariadb/data:/var/lib/mysql
+      - ./docker/mariadb/log:/var/log/mysql
+    environment:
+      - MARIADB_ROOT_PASSWORD=123456
+      - MARIADB_USER=user_db
+      - MARIADB_PASSWORD=123456
+    networks:
+      - test_network
+
+  pma:
+    image: phpmyadmin/phpmyadmin
+    container_name: test-pma
+    ports:
+      - "8090:80"
+    environment:
+      - PMA_HOST=db
+      - PMA_PORT=3306
+    links:
+      - mysql:db
+    depends_on:
+      - mysql
+    networks:
+      - test_network
+
+networks:
+  test_network:
+    driver: bridge

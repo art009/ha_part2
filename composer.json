@@ -1,0 +1,15 @@
+{
+  "name": "artavd/ha-ttask",
+  "description": "Test project part 2",
+  "type": "project",
+  "license": "BSD-3-Clause",
+  "minimum-stability": "stable",
+  "require": {
+    "php": ">=8.2"
+  },
+  "autoload": {
+    "psr-4": {
+      "app\\": "src"
+    }
+  }
+}
