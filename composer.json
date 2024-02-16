@@ -5,7 +5,8 @@
   "license": "BSD-3-Clause",
   "minimum-stability": "stable",
   "require": {
-    "php": ">=8.2"
+    "php": ">=8.2",
+    "ext-pdo": "*"
   },
   "autoload": {
     "psr-4": {

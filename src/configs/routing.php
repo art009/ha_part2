@@ -1,5 +1,9 @@
 <?php
 return [
+    '' => [
+        'controller' => \app\controllers\IndexController::class,
+        'action' => 'messages',
+    ],
     'index' => [
         'controller' => \app\controllers\IndexController::class,
         'action' => 'messages',

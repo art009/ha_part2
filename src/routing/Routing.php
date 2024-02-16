@@ -2,23 +2,28 @@
 
 namespace app\routing;
 
+use app\common\Controller;
+use app\common\MyPDO;
+use app\common\Request;
 use app\controllers\IndexController;
+use app\interfaces\IController;
 use Exception;
+use PDO;
 
 class Routing
 {
-    private array $get = [];
-    private array $post = [];
-
     private static ?Routing $instance = null;
     private function __construct(
-        private readonly array $route
+        private readonly array $route,
+        private readonly Request $request
     ) {}
 
-    public static function getInstance(array $route): Routing
-    {
+    public static function getInstance(
+        array $route,
+        Request $request
+    ): Routing {
         if (self::$instance === null) {
-            self::$instance = new self( $route );
+            self::$instance = new self( $route, $request );
         }
         return self::$instance;
     }
@@ -33,24 +38,45 @@ class Routing
         throw new Exception("Cannot serialize singleton");
     }
 
-    public function setGetParams( array $get ): void
+    /**
+     * Получаем контроллер
+     * @return Controller
+     * @throws Exception
+     */
+    public function getController( PDO $db ): Controller
     {
-        $this->get = $get;
+        $default_controller = new IndexController($db);
+
+        $path_request = $this->request->getPathRequest();
+        if ( isset($this->route[$path_request]) ) {
+            $default_controller = new $this->route[$path_request]['controller']($db);
+        }
+
+        if( !$default_controller instanceof IController)
+            throw new Exception('Необходим класс наследованный от "Controller"');
+
+        return $default_controller;
     }
 
-    public function setPostParams( array $post ): void
+    /**
+     * Исполняемый экшен по умолчанию
+     * @return string
+     */
+    public function getAction(): string
     {
-        $this->post = $post;
+        $default_action = 'error';
+        $path_request = $this->request->getPathRequest();
+        $path_request = trim($path_request,'/');
+
+        if ( isset($this->route[$path_request]) ) {
+            $default_action = $this->route[$path_request]['action'];
+        }
+
+        return $default_action;
     }
 
-    public function getController()
+    public function getRequest(): Request
     {
-        $default_controller = IndexController::class;
-
-    }
-
-    public function getAction()
-    {
-        $default_controller = 'error';
+        return $this->request;
     }
 }
