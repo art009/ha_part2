@@ -11,11 +11,6 @@ class UsersController extends Controller
 
     }
 
-    public function updateOrCreate( $request )
-    {
-
-    }
-
     public function delete( $request )
     {
 

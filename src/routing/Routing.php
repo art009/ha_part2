@@ -48,6 +48,7 @@ class Routing
         $default_controller = new IndexController($db);
 
         $path_request = $this->request->getPathRequest();
+//        var_dump($path_request);exit;
         if ( isset($this->route[$path_request]) ) {
             $default_controller = new $this->route[$path_request]['controller']($db);
         }

@@ -45,6 +45,6 @@ readonly class Request
     public function getPathRequest(): string
     {
         $url = explode('?', $this->path_request);
-        return $url[0];
+        return trim($url[0],'/');
     }
 }

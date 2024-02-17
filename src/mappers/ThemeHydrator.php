@@ -3,6 +3,7 @@
 namespace app\mappers;
 
 use app\entities\Theme;
+use app\dto\Theme as ThemeDTO;
 
 class ThemeHydrator {
     public function hydrate(array $data): Theme
@@ -13,10 +14,9 @@ class ThemeHydrator {
         );
     }
 
-    public function extract(Theme $theme): array
+    public function extract(ThemeDTO $theme): array
     {
         return [
-            'theme_id' => $theme->getId(),
             'theme_name' => $theme->getName()
         ];
     }

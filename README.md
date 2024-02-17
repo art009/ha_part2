@@ -35,3 +35,12 @@ CREATE TABLE users
     user_hash VARCHAR(32) # md5()
 );
 ```
+
+## Добавим fk
+```sql
+ALTER TABLE `messages` ADD CONSTRAINT `fk-messages-theme_id` FOREIGN KEY (`theme_id`) 
+    REFERENCES `theme`(`theme_id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+ALTER TABLE `messages` ADD CONSTRAINT `fk-messages-user_id` FOREIGN KEY (`user_id`) 
+    REFERENCES `users`(`user_id`) ON DELETE CASCADE ON UPDATE CASCADE; 
+```

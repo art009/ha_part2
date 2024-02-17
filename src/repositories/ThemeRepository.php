@@ -3,6 +3,7 @@
 namespace app\repositories;
 
 use app\entities\Theme;
+use app\dto\Theme as ThemeDTO;
 use app\mappers\ThemeHydrator;
 use PDO;
 
@@ -23,9 +24,13 @@ class ThemeRepository
      */
     public function getAll( int $limit = 10, int $offset = 0): ?array
     {
-        $sql = 'SELECT * FROM theme LIMIT :limit, :offset';
-        $stmt = $this->db->query($sql);
-        $stmt->execute(['limit' => $limit, 'offset' => $offset]);
+        $sql = 'SELECT * FROM theme LIMIT :offset, :limit';
+        $this->db->setAttribute(PDO::ATTR_EMULATE_PREPARES, FALSE);
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute([
+            'limit' => $limit,
+            'offset' => $offset
+        ]);
         $themesData = $stmt->fetchAll();
 
         if ($themesData) {
@@ -40,7 +45,7 @@ class ThemeRepository
     public function getById( int $id ): ?Theme
     {
         $sql = 'SELECT * FROM theme WHERE theme_id = :theme_id';
-        $stmt = $this->db->query($sql);
+        $stmt = $this->db->prepare($sql);
         $stmt->execute(['theme_id' => $id]);
         $themeData = $stmt->fetch();
 
@@ -51,12 +56,12 @@ class ThemeRepository
         return null;
     }
 
-    public function save(Theme $theme): void
+    public function save(ThemeDTO $theme): void
     {
         $themeData = $this->hydrator->extract($theme);
-        $sql = 'INSERT INTO theme (theme_id, theme_name) VALUES (:id, :name)';
+        $sql = 'INSERT INTO theme ( theme_name) VALUES (:name)';
         $this->db
-            ->query($sql)
+            ->prepare($sql)
             ->execute($themeData);
     }
 
@@ -65,7 +70,7 @@ class ThemeRepository
         $themeData = $this->hydrator->extract($theme);
         $sql = "UPDATE theme SET theme_name = :name WHERE theme_id = :id";
         $this->db
-            ->query($sql)
+            ->prepare($sql)
             ->execute($themeData);
     }
 }

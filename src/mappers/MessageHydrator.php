@@ -2,6 +2,7 @@
 
 namespace app\mappers;
 
+use app\dto\Message as MessageDTO;
 use app\entities\Message;
 
 class MessageHydrator
@@ -17,13 +18,12 @@ class MessageHydrator
         );
     }
 
-    public function extract(Message $message): array
+    public function extract(MessageDTO $message): array
     {
         return [
-            'message_id' => $message->getId(),
             'theme_id' => $message->getThemeId(),
             'message_text' => $message->getText(),
-            'message_time' => $message->getTime(),
+            'message_time' => time(),
             'user_id' => $message->getUserId(),
         ];
     }

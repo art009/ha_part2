@@ -3,6 +3,7 @@
 namespace app\mappers;
 
 use app\entities\User;
+use app\dto\User as UserDTO;
 
 class UserHydrator
 {
@@ -14,10 +15,9 @@ class UserHydrator
         );
     }
 
-    public function extract(User $user): array
+    public function extract(UserDTO $user): array
     {
         return [
-            'user_id' => $user->getId(),
             'user_hash' => $user->getHash()
         ];
     }

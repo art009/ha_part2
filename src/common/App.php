@@ -58,6 +58,6 @@ class App
         if ( !method_exists($controller,$action) ) {
             throw new Exception('Страница не найдена', 404);
         }
-        echo (new $controller($db))->$action();
+        echo (new $controller($db))->$action($this->getRequest());
     }
 }

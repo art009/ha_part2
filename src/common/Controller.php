@@ -2,7 +2,9 @@
 
 namespace app\common;
 
+use app\entities\User;
 use app\interfaces\IController;
+use app\services\UserService;
 use Exception;
 use PDO;
 use Throwable;
@@ -10,10 +12,13 @@ use Throwable;
 class Controller implements IController
 {
     public string $layout = 'main.php';
+    public ?User $user = null;
 
     public function __construct(
         private readonly ?PDO $db = null
-    ) {}
+    ) {
+        $this->user = (new UserService($this->db) )->getUser();
+    }
 
     public function getDb(): PDO
     {
@@ -23,7 +28,7 @@ class Controller implements IController
     /**
      * @throws Throwable
      */
-    public function render(string $view, array $params = []):string
+    public function renderPartial(string $view, array $params = []):string
     {
         $file_path = [dirname(__DIR__)];
         $file_path[] = 'views';
@@ -33,6 +38,40 @@ class Controller implements IController
         if (!file_exists($file)) {
             throw new Exception('Файл представления не найден.');
         }
+
+        return $this->renderPhpFile($file, $params);
+    }
+
+    public function render(string $view, array $params = []):string
+    {
+        $content = $this->renderPartial( $view, $params);
+        return $this->renderWrap($content);
+    }
+
+    /**
+     * Рендеринг шаблона
+     * @param string $content
+     * @return string
+     * @throws Throwable
+     */
+    private function renderWrap( string $content): string
+    {
+        $file_path = [dirname(__DIR__)];
+        $file_path[] = 'views';
+        $file_path[] = 'layouts';
+        $file_path[] = $this->layout;
+        $file = implode(DIRECTORY_SEPARATOR,$file_path);
+
+        if (!file_exists($file)) {
+            throw new Exception('Файл представления не найден.');
+        }
+
+        /**
+         * здесь можно переменные вставлять для шаблона
+         */
+        $params = [
+            'content' => $content
+        ];
 
         return $this->renderPhpFile($file, $params);
     }

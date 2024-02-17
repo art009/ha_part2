@@ -3,6 +3,8 @@
 namespace app\controllers;
 
 use app\common\Controller;
+use app\repositories\MessageRepository;
+use app\repositories\ThemeRepository;
 use Throwable;
 
 class IndexController extends Controller
@@ -26,9 +28,12 @@ class IndexController extends Controller
      */
     public function messages(): string
     {
+        $themes = (new ThemeRepository($this->getDb()))
+            ->getAll(10,0);
+
         return $this->render('index/messages.php',[
-            'code'=>404,
-            'message'=>'Страница не найдена!'
+            'themes' => $themes,
+            'user' => $this->user,
         ]);
     }
 

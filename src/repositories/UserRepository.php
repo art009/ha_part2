@@ -3,6 +3,7 @@
 namespace app\repositories;
 
 use app\entities\User;
+use app\dto\User as UserDTO;
 use app\mappers\UserHydrator;
 use PDO;
 
@@ -37,10 +38,29 @@ class UserRepository
         return null;
     }
 
+    public function getByHash( string $hash ): ?User
+    {
+        $sql = 'SELECT * FROM users WHERE user_hash = :user_hash';
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute(['user_hash' => $hash]);
+        $userData = $stmt->fetch();
+
+        if ($userData) {
+            return $this->hydrator->hydrate($userData);
+        }
+
+        return null;
+    }
+
+    /**
+     * Поиск пользователя по id
+     * @param int $id
+     * @return User|null
+     */
     public function getById( int $id ): ?User
     {
         $sql = 'SELECT * FROM users WHERE user_id = :user_id';
-        $stmt = $this->db->query($sql);
+        $stmt = $this->db->prepare($sql);
         $stmt->execute(['user_id' => $id]);
         $userData = $stmt->fetch();
 
@@ -51,12 +71,14 @@ class UserRepository
         return null;
     }
 
-    public function save(User $user): void
+    public function save( UserDTO $user): ?User
     {
         $userData = $this->hydrator->extract($user);
-        $sql = 'INSERT INTO users (user_id, user_hash) VALUES (:user_id, :user_hash)';
+        $sql = 'INSERT INTO users (user_hash) VALUES (:user_hash)';
         $this->db
-            ->query($sql)
+            ->prepare($sql)
             ->execute($userData);
+        $lastInsertId = $this->db->lastInsertId();
+        return $this->getById($lastInsertId);
     }
 }
