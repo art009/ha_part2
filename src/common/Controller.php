@@ -9,6 +9,8 @@ use Throwable;
 
 class Controller implements IController
 {
+    public string $layout = 'main.php';
+
     public function __construct(
         private readonly ?PDO $db = null
     ) {}

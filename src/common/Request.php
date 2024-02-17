@@ -11,21 +11,37 @@ readonly class Request
         private array  $files = [],
     ) {}
 
+    /**
+     * Get запрос
+     * @return array
+     */
     public function getParams(): array
     {
         return $this->get;
     }
 
+    /**
+     * Post запрос
+     * @return array
+     */
     public function getPost(): array
     {
         return $this->post;
     }
 
+    /**
+     * Передача файлов
+     * @return array
+     */
     public function getFiles(): array
     {
         return $this->files;
     }
 
+    /**
+     * Запрос без get параметров
+     * @return string
+     */
     public function getPathRequest(): string
     {
         $url = explode('?', $this->path_request);
